@@ -1,0 +1,420 @@
+[01]
+NAME="Path 1"
+sETUP="PATH='/usr/bin:/bin' ; touch file$$"
+CLEAN="rm -f file$$"
+TESTS=
+  echo 'ls -la /bin .'
+[01-END]
+
+[02]
+NAME="Path 2"
+SETUP="PATH='/bin' ; touch file$$"
+CLEAN="rm -f file$$"
+TESTS=
+  echo 'ls -la /bin .'
+[02-END]
+
+[03]
+NAME="Path 3"
+SETUP="PATH=':/usr/bin:/bin:' ; touch file$$"
+CLEAN="rm -f file$$"
+TESTS=
+  echo 'ls -la /bin .'
+[03-END]
+
+[04]
+NAME="Path 4"
+SETUP="touch file$$;PATH=''"
+CLEAN="/bin/rm -f file$$"
+TESTS=
+  echo 'ls -la /bin .'
+[04-END]
+
+[05]
+NAME="Path 5"
+SETUP="PATH='/tmp:/root/:/bin' ; /usr/bin/touch file$$"
+CLEAN="/bin/rm -f file$$"
+TESTS=
+  echo 'ls -la /bin .'
+[05-END]
+
+[06]
+NAME="Path 6"
+SETUP="PATH=' ' ; /usr/bin/touch file$$"
+CLEAN="/bin/rm -f file$$"
+TESTS=
+  echo 'ls -la /bin .'
+[06-END]
+
+[07]
+NAME="Path 7"
+SETUP="PATH='coucou' ; /usr/bin/touch file$$"
+CLEAN="/bin/rm -f file$$"
+TESTS=
+  echo 'ls -la /bin .'
+[07-END]
+
+[08]
+NAME="Path 8"
+SETUP="PATH='/' ; /usr/bin/touch file$$"
+CLEAN="/bin/rm -f file$$"
+TESTS=
+  echo 'ls -la /bin .'
+[08-END]
+
+[09]
+NAME="Path 9"
+SETUP="PATH='.mybin' ; /usr/bin/touch file$$ ; /bin/mkdir .mybin ; /bin/cp /bin/ls .mybin/"
+CLEAN="/bin/rm -f file$$ ; /bin/rm -Rf .mybin"
+TESTS=
+  echo 'ls -la /bin .'
+[09-END]
+
+[10]
+NAME="Path 10"
+SETUP="unset PATH ; /usr/bin/touch file$$"
+CLEAN="/bin/rm -f file$$"
+TESTS=
+  echo 'ls -la /bin .'
+[10-END]
+
+
+[11]
+NAME="Just a pwd"
+SETUP=""
+CLEAN=""
+TESTS=
+  echo 'pwd'
+[11-END]
+
+[12]
+NAME="Pipe with builtin"
+SETUP="OLDPATH=$PATH ; PATH='/toto'"
+CLEAN="PATH=$OLDPATH"
+TESTS=
+  echo 'setenv | /bin/grep PATH'
+[12-END]
+
+[13]
+NAME="Check exec"
+SETUP="mkdir bin ; cp /bin/ls bin/cat"
+CLEAN="rm -Rf bin"
+TESTS=
+  echo 'pwd ; cd bin ; ls -l'
+  echo 'cd ..'
+  echo 'bin/cat'
+  sleep 0.5
+  echo 'pwd'
+[13-END]
+
+[14]
+NAME="Check exit"
+SETUP=""
+CLEAN=""
+TESTS=
+  echo 'exit 25'
+[14-END]
+
+[15]
+NAME="Check non existant bin"
+SETUP="PATH='/bin:/usr/bin'"
+CLEAN=""
+TESTS=
+  echo 'coucou'
+[15-END]
+
+[16]
+NAME="setenv and unsetenv"
+SETUP="/usr/bin/env > .lstenv ; while read varenv ; do unset $varenv ; done < <(/bin/cat .lstenv | /usr/bin/cut -f1 -d=) ; export PATH=/bin:/usr/bin ; export _=ls ; export LS_COLORS=RED ; export MYBG=1 ; export LVL=42 ; export NOTE=0"
+CLEAN="while read varenv ; do export "$varenv" 2>/dev/null ; done  < <(/bin/cat .lstenv) ; /bin/rm -f .lstenv"
+TESTS=
+  echo 'unsetenv HOSTTYPE VENDOR OSTYPE MACHTYPE SHLVL PWD LOGNAME USER GROUP HOST REMOTEHOST'
+  echo 'unsetenv _'
+  echo 'unsetenv LS_COLORS'
+  echo 'unsetenv NOTE'
+  echo 'setenv toto'
+  echo 'setenv tata coucou'
+  echo 'env'
+  echo '/bin/env'
+  echo 'setenv titi abcd'
+  echo 'unsetenv tata'
+  echo 'env'
+[16-END]
+
+[17]
+NAME="cd"
+SETUP=""
+CLEAN="rm -Rf plopplop"
+TESTS=
+  echo "mkdir plopplop"
+  echo "cd plopplop"
+  echo "pwd"
+  echo -e "cd -\necho KEY\npwd\ncd /\nls"
+  echo "cd -"
+  echo "ls"
+[17-END]
+
+[18]
+NAME="cd and error messages"
+SETUP="mkdir testdircd ; chmod 000 testdircd"
+CLEAN="chmod 755 testdircd ; rmdir testdircd"
+TESTS=
+  echo "cd testdircd"
+[18-END]
+
+[19]
+NAME="space and tab"
+SETUP=""
+CLEAN=""
+TESTS=
+  echo -e ""
+  echo -e "ls"
+  echo -e "ls -l"
+  echo -e "ls     -l"
+  echo -e "     ls     -l"
+  echo -e "ls -l     "
+  echo -e "    ls     -l     -a    "
+  echo -e "ls\t"
+  echo -e "\tls"
+  echo -e "\tls\t-l"
+  echo -e "\t\t    ls\t     \t-l    \t\t  \t -a    \t\t"
+[19-END]
+
+[20]
+NAME="separator ;"
+SETUP=""
+CLEAN=""
+TESTS=
+  echo -e "    \t  ls  -l;echo toto  ;  ls\t;\techo plop"
+[20-END]
+
+[21]
+NAME="simple pipe"
+SETUP=""
+CLEAN=""
+TESTS=
+  echo -e "ls /dev | grep tty"
+[21-END]
+
+[22]
+NAME="pipe"
+SETUP=""
+CLEAN=""
+TESTS=
+  echo -e "ls | grep plop"
+  echo -e "\t ls   -l\t/dev|\tgrep tty"
+[22-END]
+
+[23]
+NAME="multipipe"
+SETUP=""
+CLEAN=""
+TESTS=
+  echo -e "ls /dev | cat  | tr y Y | grep ttY | cat"
+[23-END]
+
+[24]
+NAME="multipipe and FDMAX"
+SETUP="ulimit -n 21"
+CLEAN=""
+TESTS=
+  echo -e "ls -lR /dev | cat  | tr y Y | grep ttY | cat | cat | cat | cat | cat | cat |cat"
+[24-END]
+
+[25]
+NAME="multipipe and error"
+SETUP=""
+CLEAN=""
+TESTS=
+  echo -e "ls -lR /dev | cat  | tr y Y | grep ttY | cat | cati | cat"
+[25-END]
+
+[26]
+NAME="output redirect"
+SETUP=""
+CLEAN="rm fic"
+TESTS=
+  echo "ls /dev > fic"
+  echo "echo toto"
+  echo "cat fic"
+[26-END]
+
+[27]
+NAME="output double-redirect"
+SETUP=""
+CLEAN="rm fic"
+TESTS=
+  echo "ls /dev > fic"
+  echo "echo toto"
+  echo "echo plop >> fic"
+  echo "ls / >> fic"
+  echo "echo titi"
+  echo "cat fic"
+[27-END]
+
+[28]
+NAME="output redirect on bin files"
+SETUP=""
+CLEAN="rm myls"
+TESTS=
+  echo "cat /bin/ls > myls"
+  echo "chmod 755 myls"
+  echo "./myls"
+[28-END]
+
+[29]
+NAME="input redirect"
+SETUP="/bin/ls /dev > fic"
+CLEAN="rm fic"
+TESTS=
+  echo "grep tty < fic"
+[29-END]
+
+[30]
+NAME="input redirect, output redirect and multi pipe and ; separator"
+SETUP="/bin/ls /dev > fic"
+CLEAN="rm fic ficout ficout2"
+TESTS=
+  echo "grep tty < fic | tr y Y > ficout ; cat ficout | sed s/tt/uu/g > ficout2 ; cat ficout2 | tr u I"
+[30-END]
+
+[31]
+NAME="inception"
+SETUP=""
+CLEAN="rm result result2"
+TESTS=
+  echo "echo ls | /bin/tcsh > result"
+  echo "echo ls | ./42sh > result2"
+  echo "cat result"
+  echo "cat result2"
+[31-END]
+
+[32]
+NAME="redirect output on input"
+SETUP="echo coucou > fic"
+CLEAN="rm fic"
+TESTS=
+  echo "cat fic >> fic"
+  echo "cat fic"
+[32-END]
+
+
+[33]
+NAME="Gestion d'erreur (redirection >>>)"
+SETUP=""
+CLEAN=""
+TESTS=
+  echo "ls >>> .totopepito"
+[33-END]
+
+[34]
+NAME="Gestion d'erreur (pipe après redirection)"
+SETUP=""
+CLEAN=""
+TESTS=
+  echo "ls > .totopepito | grep 42sh"
+[34-END]
+
+[35]
+NAME="Gestion d'erreur (input redirection après pipe)"
+SETUP=""
+CLEAN=""
+TESTS=
+  echo "ls | grep i < .totopepito"
+[35-END]
+
+[36]
+NAME="Gestion d'erreur (pipe sans rien)"
+SETUP=""
+CLEAN=""
+TESTS=
+  echo "ls |"
+[36-END]
+
+[37]
+NAME="Gestion d'erreur (juste redirection)"
+SETUP=""
+CLEAN=""
+TESTS=
+  echo ">.totopepito"
+[37-END]
+
+[38]
+NAME="Gestion d'erreur (entre pipe)"
+SETUP=""
+CLEAN=""
+TESTS=
+  echo "cat 42sh | | touch .totopepito"
+[38-END]
+
+[39]
+NAME="Gestion d'erreur (pipe debut de chaine)"
+SETUP=""
+CLEAN=""
+TESTS=
+  echo "|ls > .totopepito"
+[39-END]
+
+[40]
+NAME="Backquotes"
+SETUP=""
+CLEAN=""
+TESTS=
+  echo "echo `ls`"
+[40-END]
+
+[41]
+NAME="Globbing"
+SETUP=""
+CLEAN=""
+TESTS=
+  echo "ls -R ../*"
+[41-END]
+
+[42]
+NAME="Parenthèses"
+SETUP=""
+CLEAN=""
+TESTS=
+  echo "(ls | cat -e) | cat -e"
+[42-END]
+
+[43]
+NAME="OU et ET"
+SETUP=""
+CLEAN=""
+TESTS=
+  echo "ls || ls -R || lol && ls ../ -R && echo salut"
+[43-END]
+
+[44]
+NAME="Mix medium 1"
+SETUP=""
+CLEAN="rm .totopepito"
+TESTS=
+  echo "ls > .totopepito ; cat < .totopepito > .raclette ; grep < .raclette i | cat -e | wc -l > .totopepito ; cat .totopepito"
+[44-END]
+
+[45]
+NAME="Mix medium 2"
+SETUP=""
+CLEAN="rm .totopepito"
+TESTS=
+  echo ">    .totopepito ls ../ -lR ; ; ; ;; ls >>   .totopepito -l ; echo .totopepito oui ; cat .totopepito"
+[45-END]
+
+[46]
+NAME="Mix medium 3"
+SETUP=""
+CLEAN="rm .tartiflette; rm .totopepito"
+TESTS=
+  echo "ls ../ -lR > .totopepito && <.totopepito cat>.totopepito; <.totopepito cat| cat >> .tartiflette; ; cat .tartiflette ;"
+[46-END]
+
+[47]
+NAME="Hard"
+SETUP=""
+CLEAN="rm .raclette ; rm .totopepito"
+TESTS=
+  echo "> .totopepito ls      -l ; echo oui > .raclette ; cat < .totopepito | grep i >> .raclette ; ls -l /dev | grep tty | grep 3 >> .raclette ; < .raclette cat | grep t | > .totopepito wc -c ; cat .totopepito"
+[47-END]
