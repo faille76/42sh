@@ -52,8 +52,10 @@ static int		b_cd_goto(char			*directory,
 	{
 	  if (errno == EACCES)
 	    fprintf(stdout, NO_PERMIT, directory);
-	  else
+	  else if (errno == ENOTDIR)
 	    fprintf(stdout, NO_FOLDER, directory);
+	  else
+	    fprintf(stdout, ERROR_NOFILE, directory);
 	}
       return (EXIT_FAILURE);
     }

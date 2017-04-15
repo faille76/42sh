@@ -5,7 +5,7 @@
 ** Login oddou_f <frederic.oddou@epitech.eu>
 **
 ** Started on  Thu May  5 14:44:42 2016 Frederic ODDOU
-** Last update Sun May 08 23:38:35 2016 oddou_f
+** Last update Sat Apr 15 21:28:42 2017 Frederic Oddou
 */
 
 #include <stdlib.h>
@@ -18,10 +18,12 @@ static int		b_which_treat(char			**av,
 {
   char			*str;
   int			i;
+  bool			find;
 
   if (!shell->write)
     return (EXIT_SUCCESS);
   i = 1;
+  find = true;
   while (av[i] != NULL)
     {
       if (b_is_builtin(av[i]) != NOT_BUILTIN)
@@ -31,9 +33,14 @@ static int		b_which_treat(char			**av,
 	  printf("%s\n", str);
 	  free(str);
 	}
+      else
+	{
+	  fprintf(stderr, ERROR_NOTFOUND, av[i]);
+	  find = false;
+	}
       i++;
     }
-  return (EXIT_SUCCESS);
+  return (find ? EXIT_SUCCESS : EXIT_FAILURE);
 }
 
 int			b_which(int				ac,

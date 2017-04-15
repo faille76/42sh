@@ -19,15 +19,6 @@ static void		shell_list_desactive(t_list	*list,
       list->treat = false;
       list = list->next;
     }
-  if (id_sep == ID_OR)
-    {
-      id_sep = ID_AND;
-      while (list != NULL && list->type_separator == id_sep)
-	{
-	  list->treat = false;
-	  list = list->next;
-	}
-    }
 }
 
 bool			shell_list_treat(t_shell	*shell)

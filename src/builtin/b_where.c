@@ -5,7 +5,7 @@
 ** Login oddou_f <frederic.oddou@epitech.eu>
 **
 ** Started on  Thu May  5 14:44:42 2016 Frederic ODDOU
-** Last update Sun Jun  5 17:33:37 2016 oddou_f
+** Last update Sat Apr 15 21:27:51 2017 Frederic Oddou
 */
 
 #include <stdlib.h>
@@ -25,51 +25,54 @@ static bool		shell_check_access(char		*str)
   return (false);
 }
 
-static void		b_where_treat_find(t_shell	*shell,
+static int		b_where_treat_find(t_shell	*shell,
 					   char		*name)
 {
   int			i;
+  int			find;
   int			len;
   char			*str;
 
-  i = 0;
+  i = find = 0;
   len = strlen(name);
   str = NULL;
   while (shell->path[i] != NULL)
     {
       len = strlen(name) + strlen(shell->path[i]) + 2;
       if ((str = realloc(str, sizeof(char) * len)) == NULL)
-	return ;
-      if (memset(str, '\0', len) == NULL)
-	return ;
-      if ((str = strcat(str, shell->path[i])) == NULL ||
-	  (str = strcat(str, "/")) == NULL ||
-	  (str = strcat(str, name)) == NULL)
-	return ;
+	return (EXIT_FAILURE);
+      memset(str, '\0', len);
+      strcat(str, shell->path[i]);
+      strcat(str, "/");
+      strcat(str, name);
       if (shell_check_access(str))
-	printf("%s\n", str);
+	find += printf("%s\n", str);
       i++;
     }
   if (str != NULL)
     free(str);
+  return (find ? EXIT_SUCCESS : EXIT_FAILURE);
 }
 
 static int		b_where_treat(char			**av,
 				      t_shell			*shell)
 {
   int			i;
+  bool			find;
 
   if (!shell->write)
     return (EXIT_SUCCESS);
   i = 1;
+  find = true;
   while (av[i] != NULL)
     {
       if (b_is_builtin(av[i]) != NOT_BUILTIN)
 	printf(IS_BUILTIN_W, av[i]);
-      b_where_treat_find(shell, av[i]);
+      if (b_where_treat_find(shell, av[i]) == EXIT_FAILURE)
+	find = false;
       i++;
     }
-  return (EXIT_SUCCESS);
+  return (find ? EXIT_SUCCESS : EXIT_FAILURE);
 }
 
 int			b_where(int				ac,
