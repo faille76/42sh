@@ -50,6 +50,7 @@ Bonus
     .42shrc
 
 Other
+
     Separator ;, || and &&
     
     Multiple pipes
